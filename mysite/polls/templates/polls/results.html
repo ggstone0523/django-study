@@ -1,0 +1,21 @@
+<h1>{{ question.question_text }}</h1>
+<ul>
+{% for choice in question.choice_set.all %}
+    <li>
+        {{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}
+        {% if userchoice == choice %}
+        : selected
+        {% endif %}
+    </li>
+{% endfor %}
+</ul>
+
+<a href="{% url 'polls:detail' question.id %}">Vote again?</a>
+<form action="{% url 'accounts:logout' %}" method="post">
+{% csrf_token %}
+    <input type="submit" value="Logout">
+</form>
+<form action="{% url 'accounts:modification' %}" method="get">
+{% csrf_token %}
+    <input type="submit" value="Modificate account">
+</form>

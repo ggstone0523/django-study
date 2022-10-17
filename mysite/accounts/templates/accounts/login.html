@@ -1,0 +1,24 @@
+<form action="{% url 'accounts:login' %}" method="POST">
+{% csrf_token %}
+    <div>
+      <label for="username">Enter your username: </label>
+      <input type="text" name="username" id="username" required>
+    </div>
+    <div>
+      <label for="password">Enter your password: </label>
+      <input type="password" name="password" id="password" required>
+    </div>
+    <input type="hidden" name="next" value="{{ next }}">
+    <div>
+      <input type="submit" value="Login">
+    </div>
+</form>
+<form action="{% url 'accounts:make' %}" method="get">
+{% csrf_token %}
+    <input type="submit" value="Make account">
+</form>
+{% if is_login_failed %}
+<script type="text/javascript">
+    alert('login infomation is wrong!')
+</script>
+{% endif %}

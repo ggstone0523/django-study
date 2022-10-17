@@ -1,0 +1,26 @@
+<form action="{% url 'accounts:modification' %}" method="POST">
+{% csrf_token %}
+    <div>
+        <label for="username">Your username: </label>
+        <input type="text" name="username" id="username" value="{{ username }}">
+    </div>
+    <div>
+        <label for="password">Your password: </label>
+        <input type="password" name="password" id="password">
+    </div>
+    <div>
+        <label for="email">Your email: </label>
+        <input type="email" name="email" id="email" value="{{ email }}">
+    </div>
+    <div>
+        <input type="submit" value="Modificate account">
+    </div>
+</form>
+<form action="{% url 'accounts:delete' %}" method="POST">
+{% csrf_token %}
+    <input type="submit" value="Delete account">
+</form>
+<form action="{% url 'accounts:logout' %}" method="post">
+{% csrf_token %}
+    <input type="submit" value="Logout">
+</form>
