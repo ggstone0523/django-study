@@ -1,0 +1,22 @@
+<form action="{% url 'polls:make' %}" method="post">
+{% csrf_token %}
+    <div>
+        <label for="question">Enter your question: </label>
+        <input type="text" name="question_text" id="question" required>
+    </div>
+    <div>
+        <label for="choice1">Enter your first choice: </label>
+        <input type="text" name="choice_text1" id="choice1" required>
+    </div>
+    <div>
+        <label for="choice2">Enter your second choice: </label>
+        <input type="text" name="choice_text2" id="choice2" required>
+    </div>
+    <div>
+        <label for="choice3">Enter your third choice: </label>
+        <input type="text" name="choice_text3" id="choice3" required>
+    </div>
+    <div>
+        <input type="submit" value="Make question">
+    </div>
+</form>   

@@ -1,4 +1,4 @@
-<form action="{% url 'accounts:modification' %}" method="POST">
+<form action="{% url 'accounts:modification' %}" method="post">
 {% csrf_token %}
     <div>
         <label for="username">Your username: </label>
@@ -16,7 +16,7 @@
         <input type="submit" value="Modificate account">
     </div>
 </form>
-<form action="{% url 'accounts:delete' %}" method="POST">
+<form action="{% url 'accounts:delete' %}" method="post">
 {% csrf_token %}
     <input type="submit" value="Delete account">
 </form>

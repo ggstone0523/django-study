@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
-from .models import Choice, Question, UserChoice
+from .models import Choice, Question, UserChoice, UserQuestion
 
 
 class IndexView(LoginRequiredMixin, generic.ListView):
@@ -71,3 +71,26 @@ def vote_view(request, question_id):
         selected_choice.votes += 1
         selected_choice.save()
         return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+
+
+@login_required(login_url="/accounts/login/")
+def make_view(request):
+    if request.method == "POST":
+        question = Question.objects.create(
+            question_text=request.POST["question_text"], pub_date=timezone.now()
+        )
+        Choice(question=question, choice_text=request.POST["choice_text1"]).save()
+        Choice(question=question, choice_text=request.POST["choice_text2"]).save()
+        Choice(question=question, choice_text=request.POST["choice_text3"]).save()
+        UserQuestion(user=request.user, question=question).save()
+        return HttpResponseRedirect(reverse("polls:index"))
+    return render(request, "polls/make.html")
+
+
+@login_required(login_url="/accounts/login/")
+def delete_view(request):
+    question = Question.objects.get(id=request.POST["delete_want_question"])
+    userquestion = UserQuestion.objects.get(question=question)
+    if userquestion.user == request.user:
+        question.delete()
+    return HttpResponseRedirect(reverse("polls:index"))

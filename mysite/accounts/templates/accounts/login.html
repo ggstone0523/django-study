@@ -1,4 +1,4 @@
-<form action="{% url 'accounts:login' %}" method="POST">
+<form action="{% url 'accounts:login' %}" method="post">
 {% csrf_token %}
     <div>
       <label for="username">Enter your username: </label>
@@ -14,7 +14,6 @@
     </div>
 </form>
 <form action="{% url 'accounts:make' %}" method="get">
-{% csrf_token %}
     <input type="submit" value="Make account">
 </form>
 {% if is_login_failed %}

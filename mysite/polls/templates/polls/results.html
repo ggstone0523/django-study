@@ -15,7 +15,7 @@
 {% csrf_token %}
     <input type="submit" value="Logout">
 </form>
-<form action="{% url 'accounts:modification' %}" method="get">
+<form action="{% url 'accounts:modification' %}" method="post">
 {% csrf_token %}
     <input type="submit" value="Modificate account">
 </form>
