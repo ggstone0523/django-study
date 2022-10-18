@@ -13,16 +13,17 @@
 </fieldset>
 <input type="submit" value="Vote">
 </form>
-<form action="{% url 'accounts:logout' %}" method="post">
-{% csrf_token %}
+<form action="{% url 'accounts:logout' %}" method="get">
     <input type="submit" value="Logout">
 </form>
-<form action="{% url 'accounts:modification' %}" method="post">
-{% csrf_token %}
+<form action="{% url 'accounts:modification' %}" method="get">
     <input type="submit" value="Modificate account">
 </form>
-<form action="{% url 'polls:delete' %}" method="post">
-{% csrf_token %}
-    <input type="hidden" name="delete_want_question" value="{{ question.id }}">
+<form action="{% url 'polls:delete' %}" method="get">
+    <input type="hidden" name="question_id" value="{{ question.id }}">
     <input type="submit" value="Delete question">
+</form>
+<form action="{% url 'polls:modification' %}" method="get">
+    <input type="hidden" name="question_id" value="{{ question.id }}">
+    <input type="submit" value="Modificate question">
 </form>

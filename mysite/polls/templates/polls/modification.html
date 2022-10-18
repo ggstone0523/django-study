@@ -1,0 +1,29 @@
+<form action="{% url 'polls:modification' %}" method="post">
+{% csrf_token %}
+    <div>
+        <label for="question">Your question: </label>
+        <input type="text" name="question_text" id="question" value="{{ question_text }}">
+    </div>
+    <div>
+        <label for="choice1">Your first choice: </label>
+        <input type="text" name="choice_text1" id="choice1" value="{{ choice_text1 }}">
+    </div>
+    <div>
+        <label for="choice2">Your second choice: </label>
+        <input type="text" name="choice_text2" id="choice2" value="{{ choice_text2 }}">
+    </div>
+    <div>
+        <label for="choice3">Your third choice: </label>
+        <input type="text" name="choice_text3" id="choice3" value="{{ choice_text3 }}">
+    </div>
+    <input type="hidden" name="question_id" value="{{ question_id }}">
+    <div>
+        <input type="submit" value="Modificate question">
+    </div>
+</form>
+<form action="{% url 'accounts:delete' %}" method="get">
+    <input type="submit" value="Delete account">
+</form>
+<form action="{% url 'accounts:logout' %}" method="get">
+    <input type="submit" value="Logout">
+</form>

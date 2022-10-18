@@ -11,11 +11,9 @@
 </ul>
 
 <a href="{% url 'polls:detail' question.id %}">Vote again?</a>
-<form action="{% url 'accounts:logout' %}" method="post">
-{% csrf_token %}
+<form action="{% url 'accounts:logout' %}" method="get">
     <input type="submit" value="Logout">
 </form>
-<form action="{% url 'accounts:modification' %}" method="post">
-{% csrf_token %}
+<form action="{% url 'accounts:modification' %}" method="get">
     <input type="submit" value="Modificate account">
 </form>

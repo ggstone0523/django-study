@@ -79,9 +79,10 @@ def make_view(request):
         question = Question.objects.create(
             question_text=request.POST["question_text"], pub_date=timezone.now()
         )
-        Choice(question=question, choice_text=request.POST["choice_text1"]).save()
-        Choice(question=question, choice_text=request.POST["choice_text2"]).save()
-        Choice(question=question, choice_text=request.POST["choice_text3"]).save()
+        for idx in range(1, 4):
+            Choice(
+                question=question, choice_text=request.POST[f"choice_text{idx}"]
+            ).save()
         UserQuestion(user=request.user, question=question).save()
         return HttpResponseRedirect(reverse("polls:index"))
     return render(request, "polls/make.html")
@@ -89,8 +90,44 @@ def make_view(request):
 
 @login_required(login_url="/accounts/login/")
 def delete_view(request):
-    question = Question.objects.get(id=request.POST["delete_want_question"])
+    question = Question.objects.get(id=request.POST["question_id"])
     userquestion = UserQuestion.objects.get(question=question)
     if userquestion.user == request.user:
         question.delete()
     return HttpResponseRedirect(reverse("polls:index"))
+
+
+@login_required(login_url="/accounts/login/")
+def modification_view(request):
+    question = Question.objects.get(
+        id=request.POST.get("question_id", request.GET.get("question_id", ""))
+    )
+    if question is None:
+        return HttpResponseRedirect(reverse("polls:index"))
+    userquestion = UserQuestion.objects.get(question=question)
+    if userquestion.user != request.user:
+        return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
+
+    choices = question.choice_set.all()
+    if request.method == "POST":
+        change_question_text = False
+        if question.question_text != request.POST["question_text"]:
+            change_question_text = True
+            question.question_text = request.POST["question_text"]
+            question.save()
+        for idx, choice in enumerate(choices):
+            if (
+                choice.choice_text == request.POST[f"choice_text{idx+1}"]
+                and not change_question_text
+            ):
+                continue
+            choice.choice_text = request.POST[f"choice_text{idx+1}"]
+            choice.votes = 0
+            choice.save()
+            UserChoice.objects.filter(choice=choice).delete()
+        return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
+
+    context = {"question_text": question.question_text, "question_id": question.id}
+    for idx, choice in enumerate(choices):
+        context[f"choice_text{idx+1}"] = choice.choice_text
+    return render(request, "polls/modification.html", context)

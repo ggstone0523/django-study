@@ -16,11 +16,9 @@
         <input type="submit" value="Modificate account">
     </div>
 </form>
-<form action="{% url 'accounts:delete' %}" method="post">
-{% csrf_token %}
+<form action="{% url 'accounts:delete' %}" method="get">
     <input type="submit" value="Delete account">
 </form>
-<form action="{% url 'accounts:logout' %}" method="post">
-{% csrf_token %}
+<form action="{% url 'accounts:logout' %}" method="get">
     <input type="submit" value="Logout">
 </form>
