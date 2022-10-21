@@ -1,24 +1,41 @@
-<form action="{% url 'accounts:modification' %}" method="post">
-{% csrf_token %}
+{% load static %}
+
+<link href="{% static 'accounts/login.css' %}" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
+<div class="parents">
     <div>
-        <label for="username">Your username: </label>
-        <input type="text" name="username" id="username" value="{{ username }}">
+        <form action="{% url 'accounts:modification' %}" method="post" class="rounded border border-primary p-2">
+        {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Your username: </label>
+                <input type="text" name="username" id="username" value="{{ username }}" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Your password: </label>
+                <input type="password" name="password" id="password" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Your email: </label>
+                <input type="email" name="email" id="email" value="{{ email }}" class="form-control" required>
+            </div>
+            <div>
+                <input type="submit" value="Modificate account" class="btn btn-primary">
+            </div>
+        </form>
+        <div class="rounded border border-primary p-2">
+            <form action="{% url 'polls:index' %}" method="get">
+                <label for="index-poll" class="form-label">If you want to go back to the main page: </label>
+                <input type="submit" value="Go to main page" id="index-poll" class="btn btn-primary form-control">
+            </form>
+            <form action="{% url 'accounts:delete' %}" method="get">
+                <label for="delete-account" class="form-label">If you don't need your account anymore: </label>
+                <input type="submit" value="Delete account" id="delete-account" class="btn btn-primary form-control">
+            </form>
+            <form action="{% url 'accounts:logout' %}" method="get">
+                <label for="logout" class="form-label">If you want to leave this site: </label>
+                <input type="submit" value="Logout" id="logout" class="btn btn-primary form-control">
+            </form>
+        </div>
     </div>
-    <div>
-        <label for="password">Your password: </label>
-        <input type="password" name="password" id="password">
-    </div>
-    <div>
-        <label for="email">Your email: </label>
-        <input type="email" name="email" id="email" value="{{ email }}">
-    </div>
-    <div>
-        <input type="submit" value="Modificate account">
-    </div>
-</form>
-<form action="{% url 'accounts:delete' %}" method="get">
-    <input type="submit" value="Delete account">
-</form>
-<form action="{% url 'accounts:logout' %}" method="get">
-    <input type="submit" value="Logout">
-</form>
+</div>

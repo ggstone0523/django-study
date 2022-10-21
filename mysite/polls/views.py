@@ -90,7 +90,7 @@ def make_view(request):
 
 @login_required(login_url="/accounts/login/")
 def delete_view(request):
-    question = Question.objects.get(id=request.POST["question_id"])
+    question = Question.objects.get(id=request.GET["question_id"])
     userquestion = UserQuestion.objects.get(question=question)
     if userquestion.user == request.user:
         question.delete()
