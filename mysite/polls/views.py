@@ -79,7 +79,7 @@ def make_view(request):
         question = Question.objects.create(
             question_text=request.POST["question_text"], pub_date=timezone.now()
         )
-        for idx in range(1, 4):
+        for idx in range(1, int(request.POST["question_number"]) + 1):
             Choice(
                 question=question, choice_text=request.POST[f"choice_text{idx}"]
             ).save()
@@ -115,19 +115,27 @@ def modification_view(request):
             change_question_text = True
             question.question_text = request.POST["question_text"]
             question.save()
-        for idx, choice in enumerate(choices):
-            if (
-                choice.choice_text == request.POST[f"choice_text{idx+1}"]
-                and not change_question_text
-            ):
+
+        for choice in choices:
+            request_have_choice = False
+            for idx in range(1, int(request.POST["choices_number"]) + 1):
+                if choice.choice_text == request.POST[f"choice_text{idx}"]:
+                    request_have_choice = True
+                    break
+            if not request_have_choice or change_question_text:
+                choice.delete()
+
+        for idx in range(1, int(request.POST["choices_number"]) + 1):
+            choice = Choice.objects.filter(
+                choice_text=request.POST[f"choice_text{idx}"]
+            )
+            if not choice:
+                Choice.objects.create(
+                    question=question, choice_text=request.POST[f"choice_text{idx}"]
+                )
                 continue
-            choice.choice_text = request.POST[f"choice_text{idx+1}"]
-            choice.votes = 0
-            choice.save()
-            UserChoice.objects.filter(choice=choice).delete()
         return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
 
     context = {"question_text": question.question_text, "question_id": question.id}
-    for idx, choice in enumerate(choices):
-        context[f"choice_text{idx+1}"] = choice.choice_text
+    context["choices"] = choices
     return render(request, "polls/modification.html", context)
