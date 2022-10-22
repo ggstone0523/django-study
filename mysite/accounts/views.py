@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
@@ -40,15 +41,19 @@ def logout_view(request):
 
 
 def make_view(request):
+    context = {}
     if request.method == "POST":
-        User.objects.create_user(
-            username=request.POST["username"],
-            password=request.POST["password"],
-            email=request.POST["email"],
-        )
-        return HttpResponseRedirect(reverse("accounts:login"))
+        try:
+            User.objects.create_user(
+                username=request.POST["username"],
+                password=request.POST["password"],
+                email=request.POST["email"],
+            )
+            return HttpResponseRedirect(reverse("accounts:login"))
+        except (IntegrityError):
+            context["alert"] = 1
 
-    return render(request, "accounts/make.html")
+    return render(request, "accounts/make.html", context)
 
 
 @login_required(login_url="/accounts/login/")

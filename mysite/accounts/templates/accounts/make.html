@@ -22,4 +22,9 @@
             <input type="submit" value="Make account" class="btn btn-primary">
         </div>
     </form>
-</div>  
+</div>
+{% if alert == 1 %}
+<script>
+    alert('An account with the same user name already exists.')
+</script>
+{% endif %}
