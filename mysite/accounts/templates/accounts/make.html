@@ -2,6 +2,7 @@
 
 <link href="{% static 'accounts/login.css' %}" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 
 <div class="parents">
     <form action="{% url 'accounts:make' %}" method="post" class="rounded border border-primary p-2">
@@ -28,3 +29,13 @@
     alert('An account with the same user name already exists.')
 </script>
 {% endif %}
+<script type="text/javascript">
+    const password_validation = new RegExp("^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[@$!%*?&])[A-Za-z0-9@$!%*?&]{6,18}$");
+
+    $("form").on("submit", function (e){
+        if(!password_validation.test($("#password").val())) {
+            alert("password form is wrong, correct password form is 6-18 characters, at least one letter, one number and one special character");
+            e.preventDefault();
+        }
+    });
+</script>
