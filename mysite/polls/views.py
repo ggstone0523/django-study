@@ -46,96 +46,108 @@ class ResultsView(LoginRequiredMixin, generic.DetailView):
 
 @login_required(login_url="/accounts/login/")
 def vote_view(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
     try:
-        selected_choice = question.choice_set.get(pk=request.POST["choice"])
-        user_before_userchoices = UserChoice.objects.filter(
-            choice__question=question
-        ).filter(user=request.user)
-        if len(user_before_userchoices) == 1:
-            user_before_userchoices[0].choice.votes -= 1
-            user_before_userchoices[0].choice.save()
-            user_before_userchoices.delete()
+        question = get_object_or_404(Question, pk=question_id)
+        try:
             selected_choice = question.choice_set.get(pk=request.POST["choice"])
-        UserChoice.objects.create(user=request.user, choice=selected_choice)
-    except (KeyError, Choice.DoesNotExist):
-        return render(
-            request,
-            "polls/detail.html",
-            {
-                "question": question,
-                "error_message": "You didn't select a choice.",
-            },
-        )
-    else:
-        selected_choice.votes += 1
-        selected_choice.save()
-        return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+            user_before_userchoices = UserChoice.objects.filter(
+                choice__question=question
+            ).filter(user=request.user)
+            if len(user_before_userchoices) == 1:
+                user_before_userchoices[0].choice.votes -= 1
+                user_before_userchoices[0].choice.save()
+                user_before_userchoices.delete()
+                selected_choice = question.choice_set.get(pk=request.POST["choice"])
+            UserChoice.objects.create(user=request.user, choice=selected_choice)
+        except (KeyError, Choice.DoesNotExist):
+            return render(
+                request,
+                "polls/detail.html",
+                {
+                    "question": question,
+                    "error_message": "You didn't select a choice.",
+                },
+            )
+        else:
+            selected_choice.votes += 1
+            selected_choice.save()
+            return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+    except:
+        return render(request, "accounts/error.html")
 
 
 @login_required(login_url="/accounts/login/")
 def make_view(request):
-    if request.method == "POST":
-        question = Question.objects.create(
-            question_text=request.POST["question_text"], pub_date=timezone.now()
-        )
-        for idx in range(1, int(request.POST["question_number"]) + 1):
-            Choice(
-                question=question, choice_text=request.POST[f"choice_text{idx}"]
-            ).save()
-        UserQuestion(user=request.user, question=question).save()
-        return HttpResponseRedirect(reverse("polls:index"))
-    return render(request, "polls/make.html")
+    try:
+        if request.method == "POST":
+            question = Question.objects.create(
+                question_text=request.POST["question_text"], pub_date=timezone.now()
+            )
+            for idx in range(1, int(request.POST["question_number"]) + 1):
+                Choice(
+                    question=question, choice_text=request.POST[f"choice_text{idx}"]
+                ).save()
+            UserQuestion(user=request.user, question=question).save()
+            return HttpResponseRedirect(reverse("polls:index"))
+        return render(request, "polls/make.html")
+    except:
+        return render(request, "accounts/error.html")
 
 
 @login_required(login_url="/accounts/login/")
 def delete_view(request):
-    question = Question.objects.get(id=request.GET["question_id"])
-    userquestion = UserQuestion.objects.get(question=question)
-    if userquestion.user == request.user:
-        question.delete()
-    return HttpResponseRedirect(reverse("polls:index"))
+    try:
+        question = Question.objects.get(id=request.GET["question_id"])
+        userquestion = UserQuestion.objects.get(question=question)
+        if userquestion.user == request.user:
+            question.delete()
+        return HttpResponseRedirect(reverse("polls:index"))
+    except:
+        return render(request, "accounts/error.html")
 
 
 @login_required(login_url="/accounts/login/")
 def modification_view(request):
-    question = Question.objects.get(
-        id=request.POST.get("question_id", request.GET.get("question_id", ""))
-    )
-    if question is None:
-        return HttpResponseRedirect(reverse("polls:index"))
-    userquestion = UserQuestion.objects.get(question=question)
-    if userquestion.user != request.user:
-        return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
+    try:
+        question = Question.objects.get(
+            id=request.POST.get("question_id", request.GET.get("question_id", ""))
+        )
+        if question is None:
+            return HttpResponseRedirect(reverse("polls:index"))
+        userquestion = UserQuestion.objects.get(question=question)
+        if userquestion.user != request.user:
+            return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
 
-    choices = question.choice_set.all()
-    if request.method == "POST":
-        change_question_text = False
-        if question.question_text != request.POST["question_text"]:
-            change_question_text = True
-            question.question_text = request.POST["question_text"]
-            question.save()
+        choices = question.choice_set.all()
+        if request.method == "POST":
+            change_question_text = False
+            if question.question_text != request.POST["question_text"]:
+                change_question_text = True
+                question.question_text = request.POST["question_text"]
+                question.save()
 
-        for choice in choices:
-            request_have_choice = False
+            for choice in choices:
+                request_have_choice = False
+                for idx in range(1, int(request.POST["choices_number"]) + 1):
+                    if choice.choice_text == request.POST[f"choice_text{idx}"]:
+                        request_have_choice = True
+                        break
+                if not request_have_choice or change_question_text:
+                    choice.delete()
+
             for idx in range(1, int(request.POST["choices_number"]) + 1):
-                if choice.choice_text == request.POST[f"choice_text{idx}"]:
-                    request_have_choice = True
-                    break
-            if not request_have_choice or change_question_text:
-                choice.delete()
-
-        for idx in range(1, int(request.POST["choices_number"]) + 1):
-            choice = Choice.objects.filter(
-                choice_text=request.POST[f"choice_text{idx}"]
-            )
-            if not choice:
-                Choice.objects.create(
-                    question=question, choice_text=request.POST[f"choice_text{idx}"]
+                choice = Choice.objects.filter(
+                    choice_text=request.POST[f"choice_text{idx}"]
                 )
-                continue
-        return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
+                if not choice:
+                    Choice.objects.create(
+                        question=question, choice_text=request.POST[f"choice_text{idx}"]
+                    )
+                    continue
+            return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
 
-    context = {"question_text": question.question_text, "question_id": question.id}
-    context["choices"] = choices
-    return render(request, "polls/modification.html", context)
+        context = {"question_text": question.question_text, "question_id": question.id}
+        context["choices"] = choices
+        return render(request, "polls/modification.html", context)
+    except:
+        return render(request, "accounts/error.html")
