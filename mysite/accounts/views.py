@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from polls.models import UserChoice
 from django.contrib.auth.decorators import login_required
+from accounts.tasks import send_mail_view
 
 
 def login_view(request):
@@ -56,6 +57,9 @@ def make_view(request):
                     password=request.POST["password"],
                     email=request.POST["email"],
                 )
+                send_mail_view.delay(
+                    request.POST["email"], "Thanks you for make account!"
+                )
                 return HttpResponseRedirect(reverse("accounts:login"))
             except (IntegrityError):
                 context["alert"] = 1
@@ -72,7 +76,9 @@ def delete_view(request):
         for user_selected_choice in user_selected_choices:
             user_selected_choice.choice.votes -= 1
             user_selected_choice.choice.save()
+        email = request.user.email
         request.user.delete()
+        send_mail_view.delay(email, "Your account is delete!")
         return HttpResponseRedirect(reverse("accounts:login"))
     except:
         return render(request, "accounts/error.html")
